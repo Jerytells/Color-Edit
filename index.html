@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=2">
+    <link rel="stylesheet" href="style.css">
     <!-- iro.js library for premium dark color picker -->
     <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
 </head>
@@ -91,7 +91,10 @@
                     </div>
                 </div>
                 
-                <div id="colorPickerInline"></div>
+                <div id="colorPickerInline">
+                    <div id="pickerWheel"></div>
+                    <div id="pickerSliders"></div>
+                </div>
             </div>
             <div class="modal-footer">
                 <button id="btnConfirmColor" class="btn-primary">Listo</button>
@@ -99,6 +102,6 @@
         </div>
     </div>
 
-    <script src="script.js?v=2"></script>
+    <script src="script.js"></script>
 </body>
 </html>
