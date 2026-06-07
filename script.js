@@ -1,41 +1,91 @@
-console.log('Script cargado correctamente.');
+console.log('Script cargado.');
 // Obtener parámetros de la URL
 const urlParams = new URLSearchParams(window.location.search);
 const token = urlParams.get('token');
 const username = urlParams.get('username') || 'Usuario';
 const avatar = urlParams.get('avatar') || 'https://cdn.discordapp.com/embed/avatars/0.png';
 
-// Actualizar UI - Perfil y Vista Previa en Vivo
+// Actualizar UI - Perfil y Vista Previa en Vivo (Principal y Modal)
 document.getElementById('username').textContent = username;
 document.getElementById('avatar').src = avatar;
 document.getElementById('previewUsername').textContent = username;
 document.getElementById('previewAvatar').src = avatar;
+document.getElementById('previewUsernameModal').textContent = username;
+document.getElementById('previewAvatarModal').src = avatar;
 
-const colorPicker = document.getElementById('colorPicker');
 const hexInput = document.getElementById('hexInput');
 const btnSave = document.getElementById('btnSave');
 const btnRemove = document.getElementById('btnRemove');
 const btnCopyHex = document.getElementById('btnCopyHex');
 const statusDiv = document.getElementById('status');
 
+// Elementos del Modal y Trigger
+const colorPickerTrigger = document.getElementById('colorPickerTrigger');
+const colorModal = document.getElementById('colorModal');
+const btnCloseModal = document.getElementById('btnCloseModal');
+const btnConfirmColor = document.getElementById('btnConfirmColor');
+
+// Inicializar iro.js Color Picker
+const colorPicker = new iro.ColorPicker('#colorPickerInline', {
+    width: 200,
+    color: "#5865F2",
+    borderWidth: 2,
+    borderColor: "#1e1f22",
+    layout: [
+        {
+            component: iro.ui.Wheel,
+        },
+        {
+            component: iro.ui.Slider,
+            options: {
+                sliderType: 'value'
+            }
+        }
+    ]
+});
+
 let statusTimeout;
+
+// Función para abrir/cerrar modal
+function openModal() {
+    colorModal.classList.add('open');
+}
+
+function closeModal() {
+    colorModal.classList.remove('open');
+}
+
+colorPickerTrigger.addEventListener('click', openModal);
+btnCloseModal.addEventListener('click', closeModal);
+btnConfirmColor.addEventListener('click', closeModal);
+
+// Cerrar al hacer clic fuera del contenido del modal
+colorModal.addEventListener('click', (e) => {
+    if (e.target === colorModal) {
+        closeModal();
+    }
+});
 
 // Función para actualizar colores dinámicamente en la UI
 function updateColorDynamic(hexColor) {
     if (/^#[0-9A-F]{6}$/i.test(hexColor)) {
-        // Vista previa del nombre
+        // Vista previa del nombre (Principal)
         document.getElementById('previewUsername').style.color = hexColor;
+        // Vista previa del nombre (Modal)
+        document.getElementById('previewUsernameModal').style.color = hexColor;
+        // Actualizar el color de fondo del botón gatillo (circulito)
+        colorPickerTrigger.style.backgroundColor = hexColor;
     }
 }
 
 // Inicializar color
-const initialColor = colorPicker.value;
+const initialColor = colorPicker.color.hexString;
 updateColorDynamic(initialColor);
 hexInput.value = initialColor.replace('#', '').toUpperCase();
 
-// Sincronizar desde el selector de color nativo
-colorPicker.addEventListener('input', (e) => {
-    const val = e.target.value.toUpperCase();
+// Sincronizar desde el selector de color iro.js
+colorPicker.on('color:change', (color) => {
+    const val = color.hexString.toUpperCase();
     hexInput.value = val.replace('#', '');
     updateColorDynamic(val);
 });
@@ -54,7 +104,7 @@ hexInput.addEventListener('input', (e) => {
 
     if (val.length === 6) {
         const fullHex = '#' + val;
-        colorPicker.value = fullHex;
+        colorPicker.color.hexString = fullHex;
         updateColorDynamic(fullHex);
     }
 });
@@ -145,7 +195,7 @@ btnRemove.addEventListener('click', async () => {
         if (res.ok && !data.error) {
             showStatus('Color eliminado. Volviste a la normalidad.');
             // Volver al color base por defecto
-            colorPicker.value = '#5865F2';
+            colorPicker.color.hexString = '#5865F2';
             hexInput.value = '5865F2';
             updateColorDynamic('#5865F2');
         } else {
